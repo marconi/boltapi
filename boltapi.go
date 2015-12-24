@@ -113,6 +113,10 @@ func Serve(db *bolt.DB, port int) error {
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 }
 
+func (restapi *RestApi) GetHandler() http.Handler {
+	return restapi.api.MakeHandler()
+}
+
 func (restapi *RestApi) ListBuckets(w rest.ResponseWriter, r *rest.Request) {
 	bucketNames := []string{}
 	if err := restapi.db.View(func(tx *bolt.Tx) error {
