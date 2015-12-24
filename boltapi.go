@@ -38,7 +38,7 @@ var (
 	ErrBucketItemDelete  = errors.New("error deleting bucket item")
 )
 
-type AppError struct {
+type ApiError struct {
 	customErr error
 	origErr   error
 }
@@ -67,7 +67,7 @@ func (item *BucketItem) DecodeValue(rawValue []byte) error {
 	return nil
 }
 
-func (err AppError) Error() string {
+func (err ApiError) Error() string {
 	if err.origErr != nil {
 		return fmt.Sprintf("%s: %v", err.customErr, err.origErr)
 	}
@@ -125,7 +125,7 @@ func (restapi *RestApi) ListBuckets(w rest.ResponseWriter, r *rest.Request) {
 			return nil
 		})
 	}); err != nil {
-		log.Println(AppError{ErrBucketList, err})
+		log.Println(ApiError{ErrBucketList, err})
 		rest.Error(w, ErrBucketList.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -134,7 +134,7 @@ func (restapi *RestApi) ListBuckets(w rest.ResponseWriter, r *rest.Request) {
 
 func (restapi *RestApi) AddBucket(w rest.ResponseWriter, r *rest.Request) {
 	fail := func(cusromErr, origErr error) {
-		log.Println(AppError{cusromErr, origErr})
+		log.Println(ApiError{cusromErr, origErr})
 		rest.Error(w, cusromErr.Error(), http.StatusInternalServerError)
 	}
 
@@ -154,7 +154,7 @@ func (restapi *RestApi) AddBucket(w rest.ResponseWriter, r *rest.Request) {
 		_, err := tx.CreateBucket([]byte(strings.TrimSpace(bucketName)))
 		return err
 	}); err != nil {
-		log.Println(AppError{ErrBucketCreate, err})
+		log.Println(ApiError{ErrBucketCreate, err})
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -174,7 +174,7 @@ func (restapi *RestApi) GetBucket(w rest.ResponseWriter, r *rest.Request) {
 			return nil
 		})
 	}); err != nil {
-		log.Println(AppError{ErrBucketGet, err})
+		log.Println(ApiError{ErrBucketGet, err})
 		switch err {
 		case ErrBucketGet:
 			rest.Error(w, ErrBucketGet.Error(), http.StatusInternalServerError)
@@ -191,7 +191,7 @@ func (restapi *RestApi) DeleteBucket(w rest.ResponseWriter, r *rest.Request) {
 	if err := restapi.db.Update(func(tx *bolt.Tx) error {
 		return tx.DeleteBucket([]byte(bucketName))
 	}); err != nil {
-		log.Println(AppError{ErrBucketDelete, err})
+		log.Println(ApiError{ErrBucketDelete, err})
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -199,7 +199,7 @@ func (restapi *RestApi) DeleteBucket(w rest.ResponseWriter, r *rest.Request) {
 
 func (restapi *RestApi) AddBucketItem(w rest.ResponseWriter, r *rest.Request) {
 	fail := func(cusromErr, origErr error) {
-		log.Println(AppError{cusromErr, origErr})
+		log.Println(ApiError{cusromErr, origErr})
 		rest.Error(w, cusromErr.Error(), http.StatusInternalServerError)
 	}
 
@@ -240,7 +240,7 @@ func (restapi *RestApi) GetBucketItem(w rest.ResponseWriter, r *rest.Request) {
 		itemValue := bucket.Get([]byte(bucketItemKey))
 		return bucketItem.DecodeValue(itemValue)
 	}); err != nil {
-		log.Println(AppError{err, nil})
+		log.Println(ApiError{err, nil})
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -249,7 +249,7 @@ func (restapi *RestApi) GetBucketItem(w rest.ResponseWriter, r *rest.Request) {
 
 func (restapi *RestApi) UpdateBucketItem(w rest.ResponseWriter, r *rest.Request) {
 	fail := func(cusromErr, origErr error) {
-		log.Println(AppError{cusromErr, origErr})
+		log.Println(ApiError{cusromErr, origErr})
 		rest.Error(w, cusromErr.Error(), http.StatusInternalServerError)
 	}
 
@@ -290,7 +290,7 @@ func (restapi *RestApi) DeleteBucketItem(w rest.ResponseWriter, r *rest.Request)
 		}
 		return bucket.Delete([]byte(bucketItemKey))
 	}); err != nil {
-		log.Println(AppError{ErrBucketItemDelete, err})
+		log.Println(ApiError{ErrBucketItemDelete, err})
 		rest.Error(w, ErrBucketItemDelete.Error(), http.StatusInternalServerError)
 		return
 	}
