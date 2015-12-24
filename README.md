@@ -20,3 +20,35 @@ $ boltapi -dbpath=./app.db
 ```
 
 You can change what port the API listens with `-port` param.
+
+## Endpoints
+
+Exposes the following endpoints:
+
+**Buckets endpoint**
+```
+/api/v1/buckets
+
+GET  - List buckets
+POST - Add bucket
+```
+
+**Bucket endpoint**
+```
+/api/v1/buckets/<name>
+
+GET    - Retrieve list of keys within bucket
+POST   - Add item on the bucket
+DELETE - Delete bucket
+```
+
+**Bucket item endpoint**
+```
+/api/v1/buckets/<name>/<key>
+
+GET    - Retrieve item
+PUT    - Update item
+DELETE - Delete item
+```
+
+You can also check the tests for sample usage of these endpoints.
