@@ -1,4 +1,4 @@
-# BoltDB REST API [![GoDoc](https://godoc.org/github.com/boltdb/bolt?status.png)](https://godoc.org/github.com/boltdb/bolt)
+# BoltDB REST API [![GoDoc](https://godoc.org/github.com/marconi/boltapi?status.png)](https://godoc.org/github.com/marconi/boltapi)
 
 Adds restful API on top of [BoltDB](https://github.com/boltdb/bolt).
 
