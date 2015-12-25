@@ -4,7 +4,7 @@ Adds restful API on top of [BoltDB](https://github.com/boltdb/bolt).
 
 ## Building
 
-1. Install [gpm](https://github.com/pote/gpm) and [gpm-bootstrap](https://github.com/pote/gpm-bootstrap)
+1. Install [gpm](https://github.com/pote/gpm)
 2. Install dependencies:
 
 ```bash
