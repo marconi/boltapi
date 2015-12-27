@@ -162,15 +162,17 @@ func (restapi *RestApi) AddBucket(w rest.ResponseWriter, r *rest.Request) {
 
 func (restapi *RestApi) GetBucket(w rest.ResponseWriter, r *rest.Request) {
 	bucketName := r.PathParam("name")
-	keys := []string{}
+	items := []*BucketItem{}
 	if err := restapi.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		if bucket == nil {
 			return ErrBucketMissing
 		}
 
-		return bucket.ForEach(func(k, _ []byte) error {
-			keys = append(keys, string(k))
+		return bucket.ForEach(func(k, v []byte) error {
+			bucketItem := &BucketItem{Key: string(k)}
+			bucketItem.DecodeValue(v)
+			items = append(items, bucketItem)
 			return nil
 		})
 	}); err != nil {
@@ -183,7 +185,7 @@ func (restapi *RestApi) GetBucket(w rest.ResponseWriter, r *rest.Request) {
 		}
 		return
 	}
-	w.WriteJson(keys)
+	w.WriteJson(items)
 }
 
 func (restapi *RestApi) DeleteBucket(w rest.ResponseWriter, r *rest.Request) {
@@ -226,6 +228,8 @@ func (restapi *RestApi) AddBucketItem(w rest.ResponseWriter, r *rest.Request) {
 		fail(ErrBucketItemCreate, err)
 		return
 	}
+
+	w.WriteJson(payload.Value)
 }
 
 func (restapi *RestApi) GetBucketItem(w rest.ResponseWriter, r *rest.Request) {

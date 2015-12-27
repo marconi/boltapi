@@ -37,7 +37,7 @@ POST - Add bucket
 ```
 /api/v1/buckets/<name>
 
-GET    - Retrieve list of keys within bucket
+GET    - List bucket items
 POST   - Add item on the bucket
 DELETE - Delete bucket
 ```

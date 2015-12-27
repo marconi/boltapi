@@ -109,6 +109,7 @@ func TestBucketEndpoint(t *testing.T) {
 			response = NewRecorder()
 			restapi.AddBucketItem(response, request)
 			So(response.Code, ShouldEqual, http.StatusOK)
+			So(response.Body.String(), ShouldEqual, `{"isRipe":true,"name":"apple","price":2.5}`)
 
 			request = createRequest("GET", "/api/v1/buckets/bucket1/item1", nil, map[string]string{"name": "bucket1", "key": "item1"})
 			response = NewRecorder()
@@ -117,7 +118,7 @@ func TestBucketEndpoint(t *testing.T) {
 			So(response.Body.String(), ShouldEqual, `{"isRipe":true,"name":"apple","price":2.5}`)
 		})
 
-		Convey("should be able to list bucket item keys", func() {
+		Convey("should be able to list bucket items", func() {
 			request := createRequest("POST", "/api/v1/buckets", map[string]string{"name": "bucket1"}, nil)
 			response := NewRecorder()
 			restapi.AddBucket(response, request)
@@ -153,7 +154,7 @@ func TestBucketEndpoint(t *testing.T) {
 			response = NewRecorder()
 			restapi.GetBucket(response, request)
 			So(response.Code, ShouldEqual, http.StatusOK)
-			So(response.Body.String(), ShouldEqual, `["item1","item2"]`)
+			So(response.Body.String(), ShouldEqual, `[{"Key":"item1","Value":{"isRipe":true,"name":"apple","price":2.5}},{"Key":"item2","Value":{"isRipe":true,"name":"orange","price":3.5}}]`)
 		})
 
 		Convey("should be able to delete bucket", func() {
