@@ -118,10 +118,34 @@ func (restapi *RestApi) GetHandler() http.Handler {
 }
 
 func (restapi *RestApi) ListBuckets(w rest.ResponseWriter, r *rest.Request) {
+	fullParam := r.URL.Query().Get("full")
+	full := fullParam == "1" || fullParam == "true"
+
 	bucketNames := []string{}
+	buckets := []map[string]interface{}{}
+
 	if err := restapi.db.View(func(tx *bolt.Tx) error {
-		return tx.ForEach(func(name []byte, _ *bolt.Bucket) error {
-			bucketNames = append(bucketNames, string(name))
+		return tx.ForEach(func(name []byte, bucket *bolt.Bucket) error {
+
+			if full {
+				items := []*BucketItem{}
+				if err := bucket.ForEach(func(k, v []byte) error {
+					bucketItem := &BucketItem{Key: string(k)}
+					bucketItem.DecodeValue(v)
+					items = append(items, bucketItem)
+					return nil
+				}); err != nil {
+					return err
+				}
+
+				buckets = append(buckets, map[string]interface{}{
+					"name":  string(name),
+					"items": items,
+				})
+			} else {
+				bucketNames = append(bucketNames, string(name))
+			}
+
 			return nil
 		})
 	}); err != nil {
@@ -129,7 +153,12 @@ func (restapi *RestApi) ListBuckets(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, ErrBucketList.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteJson(bucketNames)
+
+	if full {
+		w.WriteJson(buckets)
+	} else {
+		w.WriteJson(bucketNames)
+	}
 }
 
 func (restapi *RestApi) AddBucket(w rest.ResponseWriter, r *rest.Request) {
